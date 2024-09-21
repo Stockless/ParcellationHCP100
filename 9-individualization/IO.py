@@ -459,11 +459,14 @@ def write_parcels_fussed(aparcels,atlas_path,hemi):
     output_path = atlas_path+"/"+hemi
     if not os.path.exists(output_path):
         os.makedirs(output_path)
+    a = 0
     for ap in aparcels:
         if len(ap.sub_parcels) > 0:
             for sp in ap.sub_parcels.values():
                 if len(sp.triangles)>0:
+                    a += 1
                     bt.write_parcels(output_path+"/fussed_parcel_"+str(sp.label)+".parcelsdata",[tri.index for tri in sp.triangles])
+    print(a)
 
 def write_hparcels_triangles(aparcels,atlas_path,hemi):
     output_path = atlas_path+"/"+hemi
