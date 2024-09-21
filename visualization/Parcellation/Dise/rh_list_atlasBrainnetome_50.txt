@@ -1,0 +1,12 @@
+parcel_CMF0_Op0
+parcel_IP0_SM0
+parcel_IP1_IT1
+parcel_Li_ST
+parcel_PoC1_PrC1
+parcel_RMF0_SF0
+parcel_SF0_Op0
+parcel_SF0_RMF0
+parcel_SF1_PrC1
+parcel_SF_2PoCi
+
+Total=10

@@ -1,0 +1,17 @@
+parcel_2PoCi_PrCu
+parcel_B0_SM0
+parcel_CAC_PrCu
+parcel_CMF0_Op0
+parcel_IC_SF
+parcel_IP0_SM0
+parcel_Li_IT
+parcel_Li_ST
+parcel_MT0_IP0
+parcel_PoC1_PrC1
+parcel_PrCu_2PoCi
+parcel_SF0_CMF0
+parcel_SM0_In0
+parcel_SM2_PoC2
+parcel_SP0_SM0
+
+Total=15

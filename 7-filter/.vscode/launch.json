@@ -1,0 +1,31 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "Python: filter_intersection.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/filter_intersection.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["D:/documentos/universidad/TESIS/HCP100/Mallados/","D:/documentos/universidad/TESIS/parcellation/parcellation-master/7-filter/segmentation_filter/","D:/documentos/universidad/TESIS/parcellation/parcellation-master/7-filter/labels/","D:/documentos/universidad/TESIS/parcellation/parcellation-master/7-filter/dk_names.txt"],
+            "cwd": "${workspaceFolder}",
+            "purpose": ["debug-in-terminal"],
+        },
+        //{
+        //    "name": "Python: segment_large_fascicles.py",
+        //    "type": "python",
+        //    "request": "launch",
+        //    "program": "${workspaceFolder}/segment_large_fascicles.py",
+        //    "console": "integratedTerminal",
+        //    "justMyCode": true,
+        //    "args": ["D:/documentos/universidad/TESIS/HCP100/Mallados/","D:/documentos/universidad/TESIS/parcellation/parcellation-master/6-intersection/intersection/","D:/documentos/universidad/TESIS/parcellation/parcellation-master/7-filter/labels/","D:/documentos/universidad/TESIS/parcellation/parcellation-master/7-filter/dk_names.txt"],
+        //    "cwd": "${workspaceFolder}",
+        //    "purpose": ["debug-in-terminal"]
+        //}
+    ]
+}
