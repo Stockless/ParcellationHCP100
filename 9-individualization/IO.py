@@ -262,20 +262,25 @@ def rename_subparcels(ap, to_renew):
             ap.remove_subparcel(label)
             ap.sub_parcels[sp.label] = sp
             for triangle in ap.sub_parcels[sp.label].triangles:
-                # Update the subparcel registered in the triangles
+                # Update the subparcel and fibers_map registered in the triangles
                 update_labels(triangle.labels_subparcel, label, sp.label)
+                triangle.fibers_map = update_keys(triangle.fibers_map,label, sp.label)
 
                 # Update the subparcel registered in the triangles of each vertex
                 for vertex_triangle in triangle.v1.triangles:
                     update_labels(vertex_triangle.labels_subparcel, label, sp.label)
+                    vertex_triangle.fibers_map = update_keys(vertex_triangle.fibers_map,label,sp.label)
                 for vertex_triangle in triangle.v2.triangles:
                     update_labels(vertex_triangle.labels_subparcel, label, sp.label)
+                    vertex_triangle.fibers_map = update_keys(vertex_triangle.fibers_map,label,sp.label)
                 for vertex_triangle in triangle.v3.triangles:
                     update_labels(vertex_triangle.labels_subparcel, label, sp.label)
+                    vertex_triangle.fibers_map = update_keys(vertex_triangle.fibers_map,label,sp.label)
 
                 # Update the neighbors triangles
                 for neighbor in triangle.neighbors:
                     update_labels(neighbor.labels_subparcel, label, sp.label)
+                    neighbor.fibers_map = update_keys(neighbor.fibers_map,label,sp.label)
         else:
             bisect.insort(new_list, label)
 
@@ -288,6 +293,11 @@ def update_labels(label_set, old_label, new_label):
     if old_label in label_set:
         label_set.remove(old_label)
         label_set.add(new_label)
+
+def update_keys(fibers_map, old_key, new_key):
+    if old_key in fibers_map:
+        fibers_map[new_key] = fibers_map.pop(old_key)
+    return fibers_map
 
 def load_preliminary_subparcels(file_path):
     
