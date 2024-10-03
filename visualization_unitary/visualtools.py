@@ -307,7 +307,7 @@ def visualize_parcellation(meshes_path, L_sp, R_sp, sub, fibras, seed=False):
 
 #Sujeto base. Puede ser cualquiera, ya que todos los mallados tienen triángulos correspondientes.
 sub = '101006'
-meshes_path= '../../../HCP100/Mallados/'
+meshes_path= 'D:/documentos/universidad/TESIS/HCP100/Mallados'
 dice_thr=0.6
 
 semilla_visualizacion = 48

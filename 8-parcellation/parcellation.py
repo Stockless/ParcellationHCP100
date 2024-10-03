@@ -279,7 +279,7 @@ def processing_parcels(aparcels,idc,dc_thr,size_thr,parcel_names,trac,trac_path,
             for i, subparcel in anatomic_parcel.sub_parcels.items():
                 remove_less_representative_triangles(subparcel)
                 if len(subparcel.triangles) == 0:
-                    anatomic_parcel.remove_subparcel(subparcel) #debo eliminarlas después
+                    anatomic_parcel.remove_subparcel(subparcel)
             """Density center calculation"""
             recalc_probability(anatomic_parcel)
             n_remove += remove_small_parcels(aparcels,anatomic_parcel,parcel_names,size_thr,trac,trac_path,hemi)
@@ -400,11 +400,11 @@ def main():
     parser.add_argument('--parcel-names',type= str, help='Input file with the names of the parcels')
     parser.add_argument('--output-dir', type=str, help='Output directory')
     parser.add_argument('--traceability',type= str, default='y', help='Write y, to obtain the traceability of the parcels')
-    parser.add_argument('--size-thr', type=float, default='0.1',help='Size to delete small parcels')
-    parser.add_argument('--dc-thr', type=float, default='0.25',help='Less probable triangles in a parcel (probability)')
+    parser.add_argument('--size-thr', type=float, default='2.5',help='Size to delete small parcels')
+    parser.add_argument('--dc-thr', type=float, default='0.15',help='Less probable triangles in a parcel (probability)')
     parser.add_argument('--idc', type=float, default='0.1',help='Percent of common triangles in the intersection of two density centers')
     parser.add_argument('--ero', type=int, default='1',help='Erosion threshold')
-    parser.add_argument('--dil', type=int, default='4',help='Dilation threshold')
+    parser.add_argument('--dil', type=int, default='6',help='Dilation threshold')
     args = parser.parse_args()
     start = time.time()
     atlas_path,trac_path,cc_path,hp_path,fp_path,ps_path = IO.create_atlas_dirs(args.output_dir,args.traceability)

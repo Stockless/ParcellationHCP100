@@ -122,7 +122,7 @@ HemiVtxlabels = read_labels(labels_folder+"rh_labels.txt")
 HemiTriangles, Lvertex = read_mesh_vtk(mesh_path,HemiVtxlabels)
 HemiTriangles = label_triangles(HemiTriangles,parcel_names)
 
-bundle_path = "D:/documentos/universidad/TESIS/parcellation/parcellation-master/11-atlasDWM_segmentation/atlasMNI/bundles_DWM/MNI_atlas_rh_IL.bundles"
+bundle_path = "D:/documentos/universidad/TESIS/parcellation/parcellation-master/11-atlasDWM_segmentation/atlasMNI/bundles_DWM/MNI_atlas_rh_AR.bundles"
 bundle = bt.read_bundle(bundle_path)
 
 
@@ -144,5 +144,6 @@ for fiber in bundle:
 
 # Print the bundles
 for key, fibers in fiber_bundles_dict.items():
-    bt.write_bundle( "D:/documentos/universidad/TESIS/parcellation/parcellation-master/11-atlasDWM_segmentation/new_atlasMNI/bundles0/MNI_atlas_rh_IL"+key+".bundles", fibers)
-    print(f"Bundle {key} saved with {len(fibers)} fibers")
+    if len(fibers) > 10:
+        bt.write_bundle( "D:/documentos/universidad/TESIS/parcellation/parcellation-master/11-atlasDWM_segmentation/new_atlasMNI/bundles0/MNI_atlas_rh_AR"+key+".bundles", fibers)
+        print(f"Bundle {key} saved with {len(fibers)} fibers")

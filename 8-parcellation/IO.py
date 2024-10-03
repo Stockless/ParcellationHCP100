@@ -429,20 +429,20 @@ def write_preliminary_subparcels(aparcels,atlas_path,hemi,trac_path,parcel_names
             f = open(bundles_path, "a")
             f.write(str(sp.label)+" ")
             f.write(", ".join(bundle_labels) + "\n")
-            for tri in sp.triangles:
-                v1_triangles = triangle_copy(tri.v1.triangles,empty_vertex)
-                v2_triangles = triangle_copy(tri.v2.triangles,empty_vertex)
-                v3_triangles = triangle_copy(tri.v3.triangles,empty_vertex)
-                tri.v1.triangles = v1_triangles
-                tri.v2.triangles = v2_triangles
-                tri.v3.triangles = v3_triangles
-                neighbors = triangle_copy(tri.neighbors,empty_vertex)
-                tri.neighbors = set(neighbors)
-                del v1_triangles, v2_triangles, v3_triangles, tri, neighbors
-            del sp, triangles
-        del ap
-    with open(atlas_path+"/"+hemi+".pickle","wb") as p_file:
-            pickle.dump(aparcels,p_file)
+    #        for tri in sp.triangles:
+    #            v1_triangles = triangle_copy(tri.v1.triangles,empty_vertex)
+    #            v2_triangles = triangle_copy(tri.v2.triangles,empty_vertex)
+    #            v3_triangles = triangle_copy(tri.v3.triangles,empty_vertex)
+    #            tri.v1.triangles = v1_triangles
+    #            tri.v2.triangles = v2_triangles
+    #            tri.v3.triangles = v3_triangles
+    #            neighbors = triangle_copy(tri.neighbors,empty_vertex)
+    #            tri.neighbors = set(neighbors)
+    #            del v1_triangles, v2_triangles, v3_triangles, tri, neighbors
+    #        del sp, triangles
+    #    del ap
+    #with open(atlas_path+"/"+hemi+".pickle","wb") as p_file:
+    #        pickle.dump(aparcels,p_file)
             
 def write_parcels_fussed(aparcels,atlas_path,hemi):
     output_path = atlas_path+"/"+hemi

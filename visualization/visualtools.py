@@ -271,7 +271,7 @@ def multiple_DSC_comp():
 
 #Sujeto base. Puede ser cualquiera, ya que todos los mallados tienen triángulos correspondientes.
 sub = '101410'
-meshes_path= '../../../HCP100/Mallados/'
+meshes_path= '/mnt/d/documentos/universidad/TESIS/HCP100/Mallados/'
 dice_thr=0.6
 
 # Selección de atlas a comparar.
@@ -279,24 +279,24 @@ atlases = ['atlas/Lefranc','atlas/Brainnetome','atlas/Narciso','atlas/Richards']
 semilla_visualizacion = 47
 
 # Comparación Dice
-final_parcels = 'Parcellation_individual/'
-lh_atlas_dict, rh_atlas_dict = load_parcels('final', '../8-parcellation/output/')
+final_parcels = 'Parcellation'
+#lh_atlas_dict, rh_atlas_dict = load_parcels('final', '../8-parcellation/output/')
 #lh_atlas_dict, rh_atlas_dict = load_parcels('final', 'ParcellationHARDI/')
-with open('atlas/Richards_Lparcels.pkl','wb') as handle:
-    pickle.dump(lh_atlas_dict,handle)
-with open('atlas/Richards_Rparcels.pkl','wb') as handle:
-    pickle.dump(rh_atlas_dict,handle)
+#with open('atlas/Richards_Lparcels.pkl','wb') as handle:
+#    pickle.dump(lh_atlas_dict,handle)
+#with open('atlas/Richards_Rparcels.pkl','wb') as handle:
+#    pickle.dump(rh_atlas_dict,handle)
 #lh_mine_common, rh_mine_common, lh_atlas_common, rh_atlas_common = dise_comparision(atlases[0], final_parcels, dice_thr)
 #lh_mine_common, rh_mine_common, lh_atlas_common, rh_atlas_common = dise_comparision(atlases[1], final_parcels, dice_thr)
 #lh_mine_common, rh_mine_common, lh_atlas_common, rh_atlas_common = dise_comparision(atlases[2], final_parcels, dice_thr)
-lh_mine_common, rh_mine_common, lh_atlas_common, rh_atlas_common = dise_comparision(atlases[3], final_parcels, dice_thr)
+#lh_mine_common, rh_mine_common, lh_atlas_common, rh_atlas_common = dise_comparision(atlases[3], final_parcels, dice_thr)
 
 # Visualizacion para Dice
 #visualize_parcellation(meshes_path, lh_atlas_common, rh_atlas_common, sub, seed = 47)
 #visualize_parcellation(meshes_path, lh_mine_common, rh_mine_common, sub, seed = 47)
 
-#Lparcels_ps, Rparcels_ps= load_parcels('ps', final_parcels)
-#Lparcels_fp, Rparcels_fp= load_parcels('fp', final_parcels)
+Lparcels_ps, Rparcels_ps= load_parcels('ps', final_parcels)
+Lparcels_fp, Rparcels_fp= load_parcels('fp', final_parcels)
 #Lparcels_hard, Rparcels_hard= load_parcels('hard', final_parcels)
 #Lparcels_cc, Rparcels_cc= load_parcels('cc', final_parcels)
 Lparcels_final, Rparcels_final= load_parcels('final', final_parcels)
@@ -366,8 +366,8 @@ plt.ylabel('Densidad de parcelas de cada tamaño')
 
 plt.show()
 #
-#visualize_parcellation(meshes_path, Lparcels_ps, Rparcels_ps, sub, seed = semilla_visualizacion)
-#visualize_parcellation(meshes_path, Lparcels_fp, Rparcels_fp, '001', seed = semilla_visualizacion)
+visualize_parcellation(meshes_path, Lparcels_ps, Rparcels_ps, sub, seed = semilla_visualizacion)
+visualize_parcellation(meshes_path, Lparcels_fp, Rparcels_fp, '001', seed = semilla_visualizacion)
 #visualize_parcellation(meshes_path, Lparcels_hard, Rparcels_hard, '001', seed = semilla_visualizacion)
 #visualize_parcellation(meshes_path, Lparcels_cc, Rparcels_cc, '001', seed = semilla_visualizacion)
 visualize_parcellation(meshes_path, Lparcels_final, Rparcels_final, sub, seed = semilla_visualizacion)

@@ -21,8 +21,10 @@ def eliminar_archivos_no_coincidentes(carpeta, nombres):
         if extension == '.bundles':
             bundle = bt.read_bundle(os.path.join(carpeta,archivo))
             len_bundle = len(bundle)
-        if nombre_archivo not in nombres:
-            print("No está en atlas_info:",n, nombre_archivo, nombres[nombre_archivo])#os.remove(os.path.join(carpeta, archivo))
+        listadenombres = list(nombres.keys())
+        if nombre_archivo not in list(nombres.keys()):
+            print("No está en atlas_info:",n, nombre_archivo)
+            os.remove(os.path.join(carpeta, archivo))
             n += 1
         if nombre_archivo in nombres and str(len_bundle) != nombres[nombre_archivo]:
             print("Número distinto de fibras:",nombre_archivo,nombres[nombre_archivo],len_bundle)
