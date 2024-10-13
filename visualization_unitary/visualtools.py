@@ -15,11 +15,11 @@ import vtk
 
 import pickle
 
-fasciculo = "D:/documentos/universidad/TESIS/HCP100/Tractografias/101006/aligned/left/aligned_lh_AR_ANT0.bundles"
-fasciculo1 = "D:/documentos/universidad/TESIS/HCP100/Tractografias/101006/aligned/left/aligned_lh_PoCi-RAC_0.bundles"
-fasciculo2 = "D:/documentos/universidad/TESIS/HCP100/Tractografias/101006/aligned/left/aligned_lh_PoCi-SF_0.bundles"
-L_parcel_names = "D:/documentos/universidad/TESIS/parcellation/parcellation-master/visualization_unitary/Parcellation/ps_parcels/leftparcel_names.txt"
-R_parcel_names = "D:/documentos/universidad/TESIS/parcellation/parcellation-master/visualization_unitary/Parcellation/ps_parcels/rightparcel_names.txt"
+fasciculo = "/mnt/d/documentos/universidad/TESIS/HCP100/Tractografias/101006/aligned/left/aligned_lh_AR_ANT0.bundles"
+fasciculo1 = "/mnt/d/documentos/universidad/TESIS/HCP100/Tractografias/101006/aligned/left/aligned_lh_PoCi-RAC_0.bundles"
+fasciculo2 = "/mnt/d/documentos/universidad/TESIS/HCP100/Tractografias/101006/aligned/left/aligned_lh_PoCi-SF_0.bundles"
+L_parcel_names = "/mnt/d/documentos/universidad/TESIS/parcellation/parcellation-master/visualization_unitary/Parcellation/ps_parcels/leftparcel_names.txt"
+R_parcel_names = "/mnt/d/documentos/universidad/TESIS/parcellation/parcellation-master/visualization_unitary/Parcellation/ps_parcels/rightparcel_names.txt"
 
 def AddBundle(fasciculo, fibras):
     tractografia = bt.read_bundle(fasciculo)
@@ -307,7 +307,7 @@ def visualize_parcellation(meshes_path, L_sp, R_sp, sub, fibras, seed=False):
 
 #Sujeto base. Puede ser cualquiera, ya que todos los mallados tienen triángulos correspondientes.
 sub = '101006'
-meshes_path= 'D:/documentos/universidad/TESIS/HCP100/Mallados'
+meshes_path= '/mnt/d/documentos/universidad/TESIS/HCP100/Mallados'
 dice_thr=0.6
 
 semilla_visualizacion = 48
@@ -328,4 +328,4 @@ Lparcels_final, Rparcels_final= load_parcels('final', final_parcels)
 #visualize_parcellation(meshes_path, Lparcels_fp, Rparcels_fp, sub,fibras, seed = semilla_visualizacion)
 #visualize_parcellation(meshes_path, Lparcels_hard, Rparcels_hard, sub,fibras, seed = semilla_visualizacion)
 #visualize_parcellation(meshes_path, Lparcels_cc, Rparcels_cc, sub, fibras, seed = semilla_visualizacion)
-#visualize_parcellation(meshes_path, Lparcels_final, Rparcels_final, sub,fibras, seed = semilla_visualizacion)
+visualize_parcellation(meshes_path, Lparcels_final, Rparcels_final, sub,fibras, seed = semilla_visualizacion)

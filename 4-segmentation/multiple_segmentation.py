@@ -14,8 +14,10 @@ sp.call(['g++', '-std=c++14', '-O3', 'segmentation.cpp', '-o', 'segmentation', '
 for sub in os.listdir(subjs_dir):
     print("Segmenting subject "+sub)
     non_segmented = subjs_dir+"/"+sub
-    subj_bundle = subjs_dir+"/"+sub+"/resampled/resampled_"+sub+".bundles"
-    output_dir = subjs_dir+"/"+sub+"/segmented6"
+    subj_bundle = subjs_dir+"/"+sub+"/3Msift_21p_sv_MNI.bundles"
+#    subj_bundle = subjs_dir+"/"+sub+"/resampled/resampled_"+sub+".bundles"
+    output_dir = subjs_dir+"/"+sub+"/segmented44"
     sp.call(['./segmentation', '21', subj_bundle, 'subject', atlas_bundles, atlas_info, output_dir])
     if clean[0] == 'Y':
-        shutil.rmtree(non_segmented)
+        print("se hubieran limpiado los datos antiguos")
+        #shutil.rmtree(non_segmented)
