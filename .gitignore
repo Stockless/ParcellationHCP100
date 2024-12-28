@@ -13,8 +13,6 @@ venv/
 # Specific extensions to ignore
 *.bundles
 *.bundlesdata
-*.txt
-*.obj
 *.tck
 
 # VSCode settings

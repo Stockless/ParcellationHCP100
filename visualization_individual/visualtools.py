@@ -14,6 +14,19 @@ import visualizationTools as vt
 
 import pickle
 
+import hashlib
+
+def deterministic_random_float_list(input_value, size=3):
+    # Convert input_value to a hash (you can use any string/number as input)
+    input_str = str(input_value).encode('utf-8')
+    hashed = hashlib.sha256(input_str).hexdigest()
+
+    # Convert hash into an integer and use modulo to get a reasonable seed
+    random_seed = int(hashed, 16) % (2**32)
+    np.random.seed(random_seed)
+
+    # Generate a list of random floats between 0 and 1
+    return np.random.random(size).tolist()
 
 def load_restricted_triangles():
     #Existen ciertos triángulos que, por definición, no pueden representar parcelas. Estos corresponden a regiones posterior-inferior de la línea media...
@@ -203,7 +216,7 @@ def visualize_parcellation(meshes_path, L_sp, R_sp, sub, seed = False):
     #Para cada parcela del hemisferio izquierdo...
     for k, v in L_sp.items():
         #Se selecciona un color de la paleta
-        color = paleta[fp.index(k)]
+        color = deterministic_random_float_list(k)
         
         if len(v) == 0:
             continue
@@ -218,7 +231,7 @@ def visualize_parcellation(meshes_path, L_sp, R_sp, sub, seed = False):
 
     #Ídem para el derecho
     for k, v in R_sp.items():
-        color = paleta[fp.index(k)]
+        color = deterministic_random_float_list(k)
     
         if len(v) == 0:
             continue
@@ -261,11 +274,11 @@ def multiple_DSC_comp():
 #Sujeto base. Puede ser cualquiera, ya que todos los mallados tienen triángulos correspondientes.
 sub = '100408'
 meshes_path= '../9-individualization/inputs/subject_mesh/'
-dice_thr=0.4
+dice_thr=0.6
 
 # Selección de atlas a comparar.
 atlases = ['atlas/Lefranc','atlas/Brainnetome','atlas/Narciso','atlas/Richards']
-semilla_visualizacion = 47
+semilla_visualizacion = 48
 
 # Comparación Dice
 salidas = "D:/documentos/universidad/TESIS/parcellation/parcellation-master/visualization_individual/Registro_salidas"
@@ -274,39 +287,26 @@ with open('atlas/Richards_Lparcels.pkl','wb') as handle:
     pickle.dump(lh_atlas_dict,handle)
 with open('atlas/Richards_Rparcels.pkl','wb') as handle:
     pickle.dump(rh_atlas_dict,handle)
-for Dir in os.listdir(salidas):
-    final_parcels = 'Registro_salidas/'+Dir
-    lh_mine_common, rh_mine_common, lh_atlas_common, rh_atlas_common = dise_comparision(atlases[0], final_parcels, dice_thr)
-    lh_mine_common, rh_mine_common, lh_atlas_common, rh_atlas_common = dise_comparision(atlases[1], final_parcels, dice_thr)
-    lh_mine_common, rh_mine_common, lh_atlas_common, rh_atlas_common = dise_comparision(atlases[2], final_parcels, dice_thr)
-    lh_mine_common, rh_mine_common, lh_atlas_common, rh_atlas_common = dise_comparision(atlases[3], final_parcels, dice_thr)
+#for Dir in os.listdir(salidas):
+ #   final_parcels = 'Registro_salidas/'+Dir
+    #lh_mine_common, rh_mine_common, lh_atlas_common, rh_atlas_common = dise_comparision(atlases[0], final_parcels, dice_thr)
+    #lh_mine_common, rh_mine_common, lh_atlas_common, rh_atlas_common = dise_comparision(atlases[1], final_parcels, dice_thr)
+    #lh_mine_common, rh_mine_common, lh_atlas_common, rh_atlas_common = dise_comparision(atlases[2], final_parcels, dice_thr)
+  #  lh_mine_common, rh_mine_common, lh_atlas_common, rh_atlas_common = dise_comparision(atlases[3], final_parcels, dice_thr)
 
     # Visualizacion para Dice
     # visualize_parcellation(meshes_path, lh_atlas_common, rh_atlas_common, '001', seed = 47)
     # visualize_parcellation(meshes_path, lh_mine_common, rh_mine_common, '001', seed = 47)
-
-    #Lparcels_ps, Rparcels_ps= load_parcels('ps', final_parcels)
-    #Lparcels_fp, Rparcels_fp= load_parcels('fp', final_parcels)
-    #Lparcels_hard, Rparcels_hard= load_parcels('hard', final_parcels)
-    #Lparcels_cc, Rparcels_cc= load_parcels('cc', final_parcels)
-    Lparcels_final, Rparcels_final= load_parcels('final', final_parcels)
-    print(len(Lparcels_final),len(Rparcels_final))
-    Lbig, Rbig = 0,0
-    Lsmall, Rsmall = 9999999,999999
-    for v in Lparcels_final:
-        if Lbig < len(Lparcels_final[v]):
-            Lbig = len(Lparcels_final[v])
-        if Lsmall > len(Lparcels_final[v]):
-            Lsmall = len(Lparcels_final[v])
-    print("L", Lbig,Lsmall)
-    for v in Rparcels_final:
-        if Rbig < len(Rparcels_final[v]):
-            Rbig = len(Rparcels_final[v])
-        if Rsmall > len(Rparcels_final[v]):
-            Rsmall = len(Rparcels_final[v])
-    print("R", Rbig,Rsmall)
-    #visualize_parcellation(meshes_path, Lparcels_ps, Rparcels_ps, sub, seed = semilla_visualizacion)
-    #visualize_parcellation(meshes_path, Lparcels_fp, Rparcels_fp, sub, seed = semilla_visualizacion)
-    #visualize_parcellation(meshes_path, Lparcels_hard, Rparcels_hard, '001', seed = semilla_visualizacion)
-    #visualize_parcellation(meshes_path, Lparcels_cc, Rparcels_cc, '001', seed = semilla_visualizacion)
-    #visualize_parcellation(meshes_path, Lparcels_final, Rparcels_final, sub, seed = semilla_visualizacion)
+final_parcels = "Parcellation"
+#
+Lparcels_ps, Rparcels_ps= load_parcels('ps', final_parcels)
+Lparcels_fp, Rparcels_fp= load_parcels('fp', final_parcels)
+Lparcels_hard, Rparcels_hard= load_parcels('hard', final_parcels)
+Lparcels_cc, Rparcels_cc= load_parcels('cc', final_parcels)
+Lparcels_final, Rparcels_final= load_parcels('final', final_parcels)
+#
+visualize_parcellation(meshes_path, Lparcels_ps, Rparcels_ps, sub, seed = semilla_visualizacion)
+visualize_parcellation(meshes_path, Lparcels_fp, Rparcels_fp, sub, seed = semilla_visualizacion)
+visualize_parcellation(meshes_path, Lparcels_hard, Rparcels_hard, sub, seed = semilla_visualizacion)
+visualize_parcellation(meshes_path, Lparcels_cc, Rparcels_cc, sub, seed = semilla_visualizacion)
+visualize_parcellation(meshes_path, Lparcels_final, Rparcels_final, sub, seed = semilla_visualizacion)

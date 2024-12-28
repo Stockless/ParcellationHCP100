@@ -14,6 +14,20 @@ import visual_tools as vt
 import vtk
 
 import pickle
+import hashlib
+import numpy as np
+
+def deterministic_random_float_list(input_value, size=3):
+    # Convert input_value to a hash (you can use any string/number as input)
+    input_str = str(input_value).encode('utf-8')
+    hashed = hashlib.sha256(input_str).hexdigest()
+
+    # Convert hash into an integer and use modulo to get a reasonable seed
+    random_seed = int(hashed, 16) % (2**32)
+    np.random.seed(random_seed)
+
+    # Generate a list of random floats between 0 and 1
+    return np.random.random(size).tolist()
 
 fasciculo = "D:/documentos/universidad/TESIS/HCP100/Tractografias/101006/aligned/left/aligned_lh_AR_ANT0.bundles"
 fasciculo1 = "D:/documentos/universidad/TESIS/HCP100/Tractografias/101006/aligned/left/aligned_lh_PoCi-RAC_0.bundles"
@@ -117,7 +131,7 @@ def create_vtk_polygon(points, polygons):
 
     return polydata
 
-def visualize_parcellation(meshes_path, L_sp, R_sp, sub, fibras, seed=False):
+def visualize_parcellation(meshes_path, L_sp, R_sp, sub, fibras, seed):
     # Cargar triángulos restringidos
     Lrestricted, Rrestricted = load_restricted_triangles()
     
@@ -132,9 +146,6 @@ def visualize_parcellation(meshes_path, L_sp, R_sp, sub, fibras, seed=False):
     for k in R_sp.keys():
         final_parcels.add(k)
     fp = list(final_parcels)
-
-    # Paleta de colores según cantidad de parcelas
-    paleta = [(np.random.random(), np.random.random(), np.random.random()) for _ in range(len(fp))]
 
     # Directorios de los mallados corticales
     Lhemi_path = os.path.join(meshes_path, sub, 'lh.obj')  # left hemisphere path
@@ -154,7 +165,7 @@ def visualize_parcellation(meshes_path, L_sp, R_sp, sub, fibras, seed=False):
     render_window_interactor = vtk.vtkRenderWindowInteractor()
     render_window_interactor.SetRenderWindow(render_window)
 
-    L_sp_biggest = {k: v for k, v in L_sp.items() if len(v)>20}
+    L_sp_biggest = {k: v for k, v in L_sp.items() if len(v)>2500}
     num_items = len(L_sp_biggest)
     num_columns = int((num_items * (16 / 9)) ** 0.5)
     num_rows = int((num_items + num_columns - 1) // num_columns)
@@ -163,7 +174,7 @@ def visualize_parcellation(meshes_path, L_sp, R_sp, sub, fibras, seed=False):
 
     # Para cada parcela del hemisferio izquierdo...
     for k, v in L_sp_biggest.items(): #Reemplazar por L_sp en lugar de L_SP_biggest para ver todas
-        color = paleta[fp.index(k)]
+        color = deterministic_random_float_list(k)
         if len(v) == 0:
             continue
     
@@ -235,7 +246,7 @@ def visualize_parcellation(meshes_path, L_sp, R_sp, sub, fibras, seed=False):
     render_window_interactor = vtk.vtkRenderWindowInteractor()
     render_window_interactor.SetRenderWindow(render_window)
 
-    R_sp_biggest = {k: v for k, v in R_sp.items() if len(v)>20}
+    R_sp_biggest = {k: v for k, v in R_sp.items() if len(v)>2500}
     #R_sp_biggest = {k: v for k, v in R_sp.items() if k == "parcel_PoCi0_PrCu0" or k == "parcel_PrCu0_PoCi0"}
     num_items = len(R_sp_biggest)
     num_columns = int((num_items * (16 / 9)) ** 0.5)
@@ -244,7 +255,7 @@ def visualize_parcellation(meshes_path, L_sp, R_sp, sub, fibras, seed=False):
 
     # Para cada parcela del hemisferio derecho...
     for k, v in R_sp_biggest.items():#Reemplazar por R_sp en lugar de R_SP_biggest para ver todas
-        color = paleta[fp.index(k)]
+        color = deterministic_random_float_list(k)
         if len(v) == 0:
             continue
 
@@ -328,4 +339,4 @@ Lparcels_final, Rparcels_final= load_parcels('final', final_parcels)
 #visualize_parcellation(meshes_path, Lparcels_fp, Rparcels_fp, sub,fibras, seed = semilla_visualizacion)
 #visualize_parcellation(meshes_path, Lparcels_hard, Rparcels_hard, sub,fibras, seed = semilla_visualizacion)
 #visualize_parcellation(meshes_path, Lparcels_cc, Rparcels_cc, sub, fibras, seed = semilla_visualizacion)
-#visualize_parcellation(meshes_path, Lparcels_final, Rparcels_final, sub,fibras, seed = semilla_visualizacion)
+visualize_parcellation(meshes_path, Lparcels_final, Rparcels_final, sub,fibras, seed = semilla_visualizacion)
