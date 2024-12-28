@@ -15,6 +15,7 @@ venv/
 *.bundlesdata
 *.tck
 *.txt
+*.parcelsdata
 
 # VSCode settings
 .vscode/
