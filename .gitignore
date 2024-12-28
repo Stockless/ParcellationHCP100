@@ -1,0 +1,29 @@
+# Python bytecode and compiled files
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+venv/
+.env
+*.env
+
+# Logs
+*.log
+
+# Specific extensions to ignore
+*.bundles
+*.bundlesdata
+*.txt
+*.obj
+*.tck
+
+# VSCode settings
+.vscode/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Operating system files
+.DS_Store
+Thumbs.db

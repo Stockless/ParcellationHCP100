@@ -109,20 +109,24 @@ def map_triangles(triangles):
     return map_tri
 
 def get_bundle_names(bundle):
-    start = bundle.find("lh")
+    start = bundle.find("lh") if "lh" in bundle else bundle.find("rh")
     if start == -1:
-        start = bundle.find("rh")
-    splitted = re.split("[._-]",bundle[start+3:])
-    splitted.pop(-1)
-    dwm_labels = ["AR","ANT","POST","CG","CG2","CG3","IFO","IL","UN"]
-    for label in dwm_labels:
-        if splitted[0].startswith(label):
-            splitted[0] = splitted[0][len(label):]
-        if splitted[0].startswith(label):
-            splitted[0] = splitted[0][len(label):]
+        return []  # No valid starting region found
+    
+    splitted = re.split("[._-]", bundle[start+3:])
+    if splitted:
+        splitted.pop(-1)  # Remove the last segment
+    
+    # Define and clean initial region
+    dwm_labels = ["AR", "ANT", "POST", "CG", "2", "3", "IFO", "IL", "UN"]
     init_region = splitted[0]
-    end_region = None
-    if len(splitted) > 1:
-        end_region = splitted[1]
-        return [init_region,end_region]
-    return [init_region]
+    for label in dwm_labels:
+        if init_region.startswith(label):
+            init_region = init_region[len(label):]
+    splitted[0] = init_region
+    init_region = re.sub(r"\d+$", "", init_region)
+    
+    # Define and clean ending region if present
+    end_region = re.sub(r"\d+$", "", splitted[1]) if len(splitted) > 1 else None
+
+    return splitted, [init_region, end_region] if end_region else [init_region]

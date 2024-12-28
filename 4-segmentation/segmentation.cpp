@@ -322,8 +322,9 @@ vector<float> get_atlas_bundles(string path, vector<string> names,unsigned short
 /*Read atlas information file*/
 void read_atlas_info(string path, vector<string> &names, vector<float> &thres,
                      unsigned int &nfibers_atlas, vector<unsigned int> &fibers_per_bundle){
-
+    
     ifstream infile(path, ios::in );
+    cout << path << endl;
     if( !infile )
         cerr << "Cant open " << endl;
 

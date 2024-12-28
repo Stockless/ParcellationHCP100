@@ -446,7 +446,7 @@ def main():
     Ranatomic_parcels, Rparcel_names = processing_parcels(Ranatomic_parcels,idc,dc_thr,size_thr,Rparcel_names,trac,trac_path,"R",args.Rremove_list_path,args.right_bundle_labels,args.Rfuse_file)
     
     IO.write_parcels_fussed(Lanatomic_parcels,fp_path,"left")
-    IO.write_parcels_fussed(Lanatomic_parcels,fp_path,"right")
+    IO.write_parcels_fussed(Ranatomic_parcels,fp_path,"right")
 
     print("Obtaining hard parcels")
     Lanatomic_parcels = get_hard_parcels(Lanatomic_parcels,Lparcel_names,trac,trac_path,"L")

@@ -33,9 +33,10 @@ int main(int argc, char const *argv[])
 	std::vector<std::vector<uint32_t>> LInTri, LFnTri, RInTri, RFnTri;
 	std::vector<std::vector<std::vector<float>>> LInPoints, LFnPoints, RInPoints, RFnPoints;
 
+	std::cout<<"Intersection Left"<<std::endl;
 	meshAndBundlesIntersection(Lvertex, n_Lvertex, Lpolygons, n_Lpolygons, nLBundles, nLFibers,
 							   nLPoints, LPoints, nPtsLine, LInTri, LFnTri, LInPoints, LFnPoints, Lfib_index);
-	std::cout<<"Intersection Left"<<std::endl;
+	std::cout<<"Intersection Right"<<std::endl;
 	meshAndBundlesIntersection(Rvertex, n_Rvertex, Rpolygons, n_Rpolygons, nRBundles, nRFibers,
 							   nRPoints, RPoints, nPtsLine, RInTri, RFnTri, RInPoints, RFnPoints, Rfib_index);
 

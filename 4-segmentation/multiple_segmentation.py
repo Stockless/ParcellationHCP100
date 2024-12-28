@@ -15,7 +15,7 @@ for sub in os.listdir(subjs_dir):
     print("Segmenting subject "+sub)
     non_segmented = subjs_dir+"/"+sub
     subj_bundle = subjs_dir+"/"+sub+"/resampled/resampled_"+sub+".bundles"
-    output_dir = subjs_dir+"/"+sub+"/segmented6"
+    output_dir = subjs_dir+"/"+sub+"/segmented44"
     sp.call(['./segmentation', '21', subj_bundle, 'subject', atlas_bundles, atlas_info, output_dir])
     if clean[0] == 'Y':
         shutil.rmtree(non_segmented)

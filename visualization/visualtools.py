@@ -16,6 +16,19 @@ from scipy.stats import norm
 
 import pickle
 
+import hashlib
+
+def deterministic_random_float_list(input_value, size=3):
+    # Convert input_value to a hash (you can use any string/number as input)
+    input_str = str(input_value).encode('utf-8')
+    hashed = hashlib.sha256(input_str).hexdigest()
+
+    # Convert hash into an integer and use modulo to get a reasonable seed
+    random_seed = int(hashed, 16) % (2**32)
+    np.random.seed(random_seed)
+
+    # Generate a list of random floats between 0 and 1
+    return np.random.random(size).tolist()
 
 def load_restricted_triangles():
     #Existen ciertos triángulos que, por definición, no pueden representar parcelas. Estos corresponden a regiones posterior-inferior de la línea media...
@@ -168,15 +181,15 @@ def save_txt (name, diccionary, dice_thr):
         f.write('\nTotal=%d' % count)
    #%%     
 
-def visualize_parcellation(meshes_path, L_sp, R_sp, sub, seed = False):
-    #Cargar trianguos restringidos
-    Lrestricted, Rrestricted= load_restricted_triangles()
+def visualize_parcellation(meshes_path, L_sp, R_sp, sub, seed=False):
+    # Cargar triángulos restringidos
+    Lrestricted, Rrestricted = load_restricted_triangles()
     
-    #Semilla para colores aleatorios
+    # Semilla para colores aleatorios
     if seed != False:
         np.random.seed(seed)
     
-    #Parcelas finales a graficar
+    # Parcelas finales a graficar
     final_parcels = set()
 
     for k in L_sp.keys():
@@ -187,60 +200,99 @@ def visualize_parcellation(meshes_path, L_sp, R_sp, sub, seed = False):
 
     fp = list(final_parcels)    
 
-    #Paleta de colores según cantidad de parcelas
+    # Paleta de colores según cantidad de parcelas
     paleta = [(np.random.random(), np.random.random(), np.random.random()) for i in range(len(fp))]
 
-    #Directorios de los mallados corticales
-    Lhemi_path = meshes_path + sub + '/lh.obj'; # left hemisphere path
-    Rhemi_path = meshes_path + sub + '/rh.obj'; # right hemisphere path
+    # Directorios de los mallados corticales
+    Lhemi_path = meshes_path + sub + '/lh.obj'  # left hemisphere path
+    Rhemi_path = meshes_path + sub + '/rh.obj'  # right hemisphere path
 
-    #Lectura de mallados
+    # Lectura de mallados
     Lvertex, Lpolygons = bt.read_mesh_obj(Lhemi_path)
     Rvertex, Rpolygons = bt.read_mesh_obj(Rhemi_path)
     
-    Lhemi = vt.Polygon(Lvertex, Lpolygons);
-    Rhemi = vt.Polygon(Rvertex, Rpolygons);
+    Lhemi = vt.Polygon(Lvertex, Lpolygons)
+    Rhemi = vt.Polygon(Rvertex, Rpolygons)
     
-    Lhemi.setOpacity(1);
-    Rhemi.setOpacity(1);
+    Lhemi.setOpacity(1)
+    Rhemi.setOpacity(1)
     
-    #Creación del render a visualizar
-    render = vt.Render();
+    # Creación del render a visualizar
+    render = vt.Render()
     
-    #Se renderizan los mallados
-    render.AddActor(Lhemi);
-    render.AddActor(Rhemi);
+    # Se renderizan los mallados
+    render.AddActor(Lhemi)
+    render.AddActor(Rhemi)
     
-    #Para cada parcela del hemisferio izquierdo...
+    # Variables to track triangles
+    L_total_triangles = len(Lpolygons)
+    R_total_triangles = len(Rpolygons)
+    L_unique_triangles = set()
+    R_unique_triangles = set()
+    L_repeated_triangles = set()  # To track already counted repeated triangles
+    R_repeated_triangles = set()
+
+    total_restricted = len(Lrestricted) + len(Rrestricted)
+    usable_triangles = L_total_triangles + R_total_triangles - total_restricted  # Adjusted total
+
+    # For left hemisphere
+    L_all_triangles = []
     for k, v in L_sp.items():
-        #Se selecciona un color de la paleta
-        color = paleta[fp.index(k)]
+        if len(L_sp) < 5000:
+            # Select a color from the palette
+            color = deterministic_random_float_list(k)
+            
+            if len(v) == 0:
+                continue
         
-        if len(v) == 0:
-            continue
-      
-        #De todos los triángulos con parcelas, se eliminan aquellos que pertenecen al conjunto de triángulos restringidos.
-        v_restricted = list(set(v).difference(Lrestricted))
+            # Remove restricted triangles
+            v_restricted = list(set(v).difference(Lrestricted))
 
-        #Se renderizan los triángulos y polígonos.
-        sp_tri = vt.Polygon(Lvertex, Lpolygons[v_restricted]);
-        sp_tri.setColor((color[0], color[1], color[2]));
-        render.AddActor(sp_tri);
+            # Collect all triangles for overlap calculation
+            for tri in v_restricted:
+                if tri in L_unique_triangles:
+                    L_repeated_triangles.add(tri)
+                else:
+                    L_unique_triangles.add(tri)
 
-    #Ídem para el derecho
+            # Render triangles
+            sp_tri = vt.Polygon(Lvertex, Lpolygons[v_restricted])
+            sp_tri.setColor((color[0], color[1], color[2]))
+            render.AddActor(sp_tri)
+
+    # For right hemisphere
+    R_all_triangles = []
     for k, v in R_sp.items():
-        color = paleta[fp.index(k)]
+        if len(R_sp) < 5000:
+            color = deterministic_random_float_list(k)
+        
+            if len(v) == 0:
+                continue
+        
+            # Remove restricted triangles
+            v_restricted = list(set(v).difference(Rrestricted))
+        
+            # Collect all triangles for overlap calculation
+            for tri in v_restricted:
+                if tri in R_unique_triangles:
+                    R_repeated_triangles.add(tri)
+                else:
+                    R_unique_triangles.add(tri)
+
+            # Render triangles
+            sp_tri = vt.Polygon(Rvertex, Rpolygons[v_restricted])
+            sp_tri.setColor((color[0], color[1], color[2]))
+            render.AddActor(sp_tri)
+
+    # Calculate percentages
+    percentage_included = (len(L_unique_triangles) + len(R_unique_triangles)) / usable_triangles * 100
+    percentage_repeated = (len(L_repeated_triangles) + len(R_repeated_triangles)) / usable_triangles * 100
+
+    # Print results
+    print(f"Percentage of triangles included in regions (excluding restricted): {percentage_included:.2f}%")
+    print(f"Percentage of repeated triangles (overlap): {percentage_repeated:.2f}%")
     
-        if len(v) == 0:
-            continue
-    
-        v_restricted = list(set(v).difference(Rrestricted))
-    
-        sp_tri = vt.Polygon(Rvertex, Rpolygons[v_restricted]);
-        sp_tri.setColor((color[0], color[1], color[2]));
-        render.AddActor(sp_tri);
-    
-    render.Start();
+    render.Start()
     del render
 
 
@@ -271,7 +323,7 @@ def multiple_DSC_comp():
 
 #Sujeto base. Puede ser cualquiera, ya que todos los mallados tienen triángulos correspondientes.
 sub = '101410'
-meshes_path= '../../../HCP100/Mallados/'
+meshes_path= 'D:/documentos/universidad/TESIS/HCP100/Mallados/'
 dice_thr=0.6
 
 # Selección de atlas a comparar.
@@ -279,7 +331,7 @@ atlases = ['atlas/Lefranc','atlas/Brainnetome','atlas/Narciso','atlas/Richards']
 semilla_visualizacion = 47
 
 # Comparación Dice
-final_parcels = 'Parcellation_individual/'
+final_parcels = 'Parcellation/'
 lh_atlas_dict, rh_atlas_dict = load_parcels('final', '../8-parcellation/output/')
 #lh_atlas_dict, rh_atlas_dict = load_parcels('final', 'ParcellationHARDI/')
 with open('atlas/Richards_Lparcels.pkl','wb') as handle:
@@ -289,17 +341,22 @@ with open('atlas/Richards_Rparcels.pkl','wb') as handle:
 #lh_mine_common, rh_mine_common, lh_atlas_common, rh_atlas_common = dise_comparision(atlases[0], final_parcels, dice_thr)
 #lh_mine_common, rh_mine_common, lh_atlas_common, rh_atlas_common = dise_comparision(atlases[1], final_parcels, dice_thr)
 #lh_mine_common, rh_mine_common, lh_atlas_common, rh_atlas_common = dise_comparision(atlases[2], final_parcels, dice_thr)
-lh_mine_common, rh_mine_common, lh_atlas_common, rh_atlas_common = dise_comparision(atlases[3], final_parcels, dice_thr)
+#lh_mine_common, rh_mine_common, lh_atlas_common, rh_atlas_common = dise_comparision(atlases[3], final_parcels, dice_thr)
 
 # Visualizacion para Dice
 #visualize_parcellation(meshes_path, lh_atlas_common, rh_atlas_common, sub, seed = 47)
 #visualize_parcellation(meshes_path, lh_mine_common, rh_mine_common, sub, seed = 47)
 
+Lparcels_final, Rparcels_final= load_parcels('final', '../8-parcellation/output/')
+Lparcels_ps, Rparcels_ps= load_parcels('ps', '../8-parcellation/output/')
+Lparcels_fp, Rparcels_fp= load_parcels('fp', '../8-parcellation/output/')
+Lparcels_hard, Rparcels_hard= load_parcels('hard', '../8-parcellation/output/')
+Lparcels_cc, Rparcels_cc= load_parcels('cc', '../8-parcellation/output/')
 #Lparcels_ps, Rparcels_ps= load_parcels('ps', final_parcels)
 #Lparcels_fp, Rparcels_fp= load_parcels('fp', final_parcels)
 #Lparcels_hard, Rparcels_hard= load_parcels('hard', final_parcels)
 #Lparcels_cc, Rparcels_cc= load_parcels('cc', final_parcels)
-Lparcels_final, Rparcels_final= load_parcels('final', final_parcels)
+#Lparcels_final, Rparcels_final= load_parcels('final', final_parcels)
 print(len(Lparcels_final),len(Rparcels_final))
 Lbig, Rbig = 0,0
 Lsmall, Rsmall = 9999999,999999
@@ -307,11 +364,11 @@ suma_parcelas = 0
 numero_parcelas = 0
 sizes = []
 for v in Lparcels_final:
-    if Lbig < len(Lparcels_final[v]):
-        Lbig = len(Lparcels_final[v])
-    if Lsmall > len(Lparcels_final[v]):
-        Lsmall = len(Lparcels_final[v])
-    if len(Lparcels_final[v]):
+    if 0 < len(Lparcels_final[v]) < 5000:
+        if Lbig < len(Lparcels_final[v]):
+            Lbig = len(Lparcels_final[v])
+        if Lsmall > len(Lparcels_final[v]):
+            Lsmall = len(Lparcels_final[v])
         suma_parcelas += len(Lparcels_final[v])
         numero_parcelas += 1
         sizes.append(len(Lparcels_final[v]))
@@ -338,15 +395,15 @@ suma_parcelas = 0
 numero_parcelas = 0
 sizes = []
 for v in Rparcels_final:
-    if Rbig < len(Rparcels_final[v]):
-        Rbig = len(Rparcels_final[v])
-    if Rsmall > len(Rparcels_final[v]):
-        Rsmall = len(Rparcels_final[v])
-    if len(Rparcels_final[v]):
+    if 0 < len(Rparcels_final[v]) < 5000:
+        if Rbig < len(Rparcels_final[v]):
+            Rbig = len(Rparcels_final[v])
+        if Rsmall > len(Rparcels_final[v]):
+            Rsmall = len(Rparcels_final[v])
         suma_parcelas += len(Rparcels_final[v])
         numero_parcelas += 1
         sizes.append(len(Rparcels_final[v]))
-print(Rbig,Rsmall,suma_parcelas/numero_parcelas)
+#print(Rbig,Rsmall,suma_parcelas/numero_parcelas)
 # Plot histogram of the vector to show the distribution
 plt.hist(sizes, bins=30, density=True, alpha=0.6, color='b')
 
@@ -367,7 +424,7 @@ plt.ylabel('Densidad de parcelas de cada tamaño')
 plt.show()
 #
 #visualize_parcellation(meshes_path, Lparcels_ps, Rparcels_ps, sub, seed = semilla_visualizacion)
-#visualize_parcellation(meshes_path, Lparcels_fp, Rparcels_fp, '001', seed = semilla_visualizacion)
-#visualize_parcellation(meshes_path, Lparcels_hard, Rparcels_hard, '001', seed = semilla_visualizacion)
-#visualize_parcellation(meshes_path, Lparcels_cc, Rparcels_cc, '001', seed = semilla_visualizacion)
+#visualize_parcellation(meshes_path, Lparcels_fp, Rparcels_fp, sub, seed = semilla_visualizacion)
+#visualize_parcellation(meshes_path, Lparcels_hard, Rparcels_hard, sub, seed = semilla_visualizacion)
+#visualize_parcellation(meshes_path, Lparcels_cc, Rparcels_cc, sub, seed = semilla_visualizacion)
 visualize_parcellation(meshes_path, Lparcels_final, Rparcels_final, sub, seed = semilla_visualizacion)

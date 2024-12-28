@@ -350,15 +350,15 @@ def get_PCC(aparcels,triangles):
                 regions_cc = list(cc[np.argmax(len_cc)]);
                 regions_cc_2 = [list(cc[i]) for i, comp in enumerate(cc) if len_cc[i] >= len_cc_thr]
                 #print(len(regions_cc_2))
-                if len(regions_cc_2) > 1:
-                    for n_cc, region_cc in enumerate(regions_cc_2):
-                        ind = [np.where(triangles_arr[tris] == vertex)[0] for vertex in region_cc]
-                        ind = np.unique(np.concatenate(ind))
-                        parcel_cc[k + "_" + str(n_cc)] = tris[ind]
-                else:
-                    ind = [np.where(triangles_arr[tris]==region_cc)[0] for region_cc in regions_cc];
-                    ind = np.unique(np.concatenate(ind));
-                    parcel_cc[k] = tris[ind]
+                #if len(regions_cc_2) > 1:
+                #    for n_cc, region_cc in enumerate(regions_cc_2):
+                #        ind = [np.where(triangles_arr[tris] == vertex)[0] for vertex in region_cc]
+                #        ind = np.unique(np.concatenate(ind))
+                #        parcel_cc[k + "_" + str(n_cc)] = tris[ind]
+                #else:
+                ind = [np.where(triangles_arr[tris]==region_cc)[0] for region_cc in regions_cc];
+                ind = np.unique(np.concatenate(ind));
+                parcel_cc[k] = tris[ind]
 
     t2 = time.time()
     # print("PCC time: ",t2-t1)
@@ -401,10 +401,10 @@ def main():
     parser.add_argument('--output-dir', type=str, help='Output directory')
     parser.add_argument('--traceability',type= str, default='y', help='Write y, to obtain the traceability of the parcels')
     parser.add_argument('--size-thr', type=float, default='0.1',help='Size to delete small parcels')
-    parser.add_argument('--dc-thr', type=float, default='0.25',help='Less probable triangles in a parcel (probability)')
-    parser.add_argument('--idc', type=float, default='0.1',help='Percent of common triangles in the intersection of two density centers')
+    parser.add_argument('--dc-thr', type=float, default='0.1',help='Less probable triangles in a parcel (probability)')
+    parser.add_argument('--idc', type=float, default='0.4',help='Percent of common triangles in the intersection of two density centers')
     parser.add_argument('--ero', type=int, default='1',help='Erosion threshold')
-    parser.add_argument('--dil', type=int, default='4',help='Dilation threshold')
+    parser.add_argument('--dil', type=int, default='5',help='Dilation threshold')
     args = parser.parse_args()
     start = time.time()
     atlas_path,trac_path,cc_path,hp_path,fp_path,ps_path = IO.create_atlas_dirs(args.output_dir,args.traceability)

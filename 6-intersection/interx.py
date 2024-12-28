@@ -19,8 +19,8 @@ for sub in os.listdir(subs_path):
     Lhemi_path = meshes_path+"/"+sub+'/lh.obj' # left mesh path
     Rhemi_path = meshes_path+"/"+sub+'/rh.obj' # right mesh path
     
-    Lbundles_path = subs_path+"/"+sub+'/aligned4/left/' # bundles path
-    Rbundles_path = subs_path+"/"+sub+'/aligned4/right/' # bundles path
+    Lbundles_path = subs_path+"/"+sub+'/aligned/left/' # bundles path
+    Rbundles_path = subs_path+"/"+sub+'/aligned/right/' # bundles path
 
     if not os.path.exists(Lbundles_path) or not os.path.exists(Rbundles_path):
         print("No aligned bundles found. Align the bundles with the bundle alignment step and try again.")
