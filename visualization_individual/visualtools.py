@@ -213,6 +213,17 @@ def visualize_parcellation(meshes_path, L_sp, R_sp, sub, seed = False):
     render.AddActor(Lhemi);
     render.AddActor(Rhemi);
     
+    # Variables to track triangles
+    L_total_triangles = len(Lpolygons)
+    R_total_triangles = len(Rpolygons)
+    L_unique_triangles = set()
+    R_unique_triangles = set()
+    L_repeated_triangles = set()  # To track already counted repeated triangles
+    R_repeated_triangles = set()
+
+    total_restricted = len(Lrestricted) + len(Rrestricted)
+    usable_triangles = L_total_triangles + R_total_triangles - total_restricted  # Adjusted total
+    
     #Para cada parcela del hemisferio izquierdo...
     for k, v in L_sp.items():
         #Se selecciona un color de la paleta
@@ -220,10 +231,16 @@ def visualize_parcellation(meshes_path, L_sp, R_sp, sub, seed = False):
         
         if len(v) == 0:
             continue
-      
+
         #De todos los triángulos con parcelas, se eliminan aquellos que pertenecen al conjunto de triángulos restringidos.
         v_restricted = list(set(v).difference(Lrestricted))
-
+      
+        # Collect all triangles for overlap calculation
+        for tri in v_restricted:
+            if tri in L_unique_triangles:
+                L_repeated_triangles.add(tri)
+            else:
+                L_unique_triangles.add(tri)
         #Se renderizan los triángulos y polígonos.
         sp_tri = vt.Polygon(Lvertex, Lpolygons[v_restricted]);
         sp_tri.setColor((color[0], color[1], color[2]));
@@ -237,10 +254,25 @@ def visualize_parcellation(meshes_path, L_sp, R_sp, sub, seed = False):
             continue
     
         v_restricted = list(set(v).difference(Rrestricted))
+        # Collect all triangles for overlap calculation
+        for tri in v_restricted:
+            if tri in R_unique_triangles:
+                R_repeated_triangles.add(tri)
+            else:
+                R_unique_triangles.add(tri)
+
     
         sp_tri = vt.Polygon(Rvertex, Rpolygons[v_restricted]);
         sp_tri.setColor((color[0], color[1], color[2]));
         render.AddActor(sp_tri);
+    
+    # Calculate percentages
+    percentage_included = (len(L_unique_triangles) + len(R_unique_triangles)) / usable_triangles * 100
+    percentage_repeated = (len(L_repeated_triangles) + len(R_repeated_triangles)) / usable_triangles * 100
+
+    # Print results
+    print(f"Percentage of triangles included in regions (excluding restricted): {percentage_included:.2f}%")
+    print(f"Percentage of repeated triangles (overlap): {percentage_repeated:.2f}%")
     
     render.Start();
     del render
@@ -272,7 +304,7 @@ def multiple_DSC_comp():
     file.close()
 
 #Sujeto base. Puede ser cualquiera, ya que todos los mallados tienen triángulos correspondientes.
-sub = '100408'
+sub = '111312'
 meshes_path= '../9-individualization/inputs/subject_mesh/'
 dice_thr=0.6
 
@@ -281,7 +313,7 @@ atlases = ['atlas/Lefranc','atlas/Brainnetome','atlas/Narciso','atlas/Richards']
 semilla_visualizacion = 48
 
 # Comparación Dice
-salidas = "D:/documentos/universidad/TESIS/parcellation/parcellation-master/visualization_individual/Registro_salidas"
+salidas = "D:/documentos/universidad/TESIS/parcellation/parcellation-master/visualization_individual/outputHCP5"
 lh_atlas_dict, rh_atlas_dict = load_parcels('final', 'ParcellationHARDI/')
 with open('atlas/Richards_Lparcels.pkl','wb') as handle:
     pickle.dump(lh_atlas_dict,handle)
@@ -299,14 +331,14 @@ with open('atlas/Richards_Rparcels.pkl','wb') as handle:
     # visualize_parcellation(meshes_path, lh_mine_common, rh_mine_common, '001', seed = 47)
 final_parcels = "Parcellation"
 #
-Lparcels_ps, Rparcels_ps= load_parcels('ps', final_parcels)
-Lparcels_fp, Rparcels_fp= load_parcels('fp', final_parcels)
+#Lparcels_ps, Rparcels_ps= load_parcels('ps', final_parcels)
+#Lparcels_fp, Rparcels_fp= load_parcels('fp', final_parcels)
 Lparcels_hard, Rparcels_hard= load_parcels('hard', final_parcels)
 Lparcels_cc, Rparcels_cc= load_parcels('cc', final_parcels)
 Lparcels_final, Rparcels_final= load_parcels('final', final_parcels)
 #
-visualize_parcellation(meshes_path, Lparcels_ps, Rparcels_ps, sub, seed = semilla_visualizacion)
-visualize_parcellation(meshes_path, Lparcels_fp, Rparcels_fp, sub, seed = semilla_visualizacion)
+#visualize_parcellation(meshes_path, Lparcels_ps, Rparcels_ps, sub, seed = semilla_visualizacion)
+#visualize_parcellation(meshes_path, Lparcels_fp, Rparcels_fp, sub, seed = semilla_visualizacion)
 visualize_parcellation(meshes_path, Lparcels_hard, Rparcels_hard, sub, seed = semilla_visualizacion)
 visualize_parcellation(meshes_path, Lparcels_cc, Rparcels_cc, sub, seed = semilla_visualizacion)
 visualize_parcellation(meshes_path, Lparcels_final, Rparcels_final, sub, seed = semilla_visualizacion)

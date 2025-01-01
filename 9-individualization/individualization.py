@@ -278,27 +278,50 @@ def processing_parcels(aparcels,idc,dc_thr,size_thr,parcel_names,trac,trac_path,
     #    recalc_probability(ap)
     return aparcels,parcel_names
 
-def get_hard_parcels(aparcels,parcel_names,trac,trac_path,hemi):
+def get_hard_parcels(aparcels, parcel_names, trac, trac_path, hemi):
+    total_hard_parcels = 0
+    total_triangles_seen = set()
+    total_triangles_in_hard_parcels = set()
+    
     if trac == "y":
-        probmap_file = open(trac_path+"/"+hemi+"probmap.txt","a+")
+        probmap_file = open(trac_path + "/" + hemi + "probmap.txt", "a+")
+    
+    hparcels_map = {}
+    
     for ap in aparcels:
-        hparcels_map = {}
-        for k,sp in ap.sub_parcels.items():
+        for k, sp in ap.sub_parcels.items():
             for tri in sp.triangles:
-                selected_parcel = most_probable(tri.prob_map)
-                if trac == "y":
-                    probmap_file.write(str(tri.index)+" "+str(selected_parcel)+"\n")
-                if selected_parcel != -1:
-                    selected_parcel = ap.find_subparcel(selected_parcel)
-                    if selected_parcel != None:
-                        if not selected_parcel.label in hparcels_map:
-                            hparcels_map[selected_parcel.label] = set()
-                        hparcels_map[selected_parcel.label].add(tri)
-        for label, triangles in hparcels_map.items():
-            sp = ap.find_subparcel(label)
-            hparcel = SubParcel(label, ap.label, triangles, [])
-            ap.add_hparcel_triangles(parcel_names[int(label)],triangles)
-            ap.hard_parcels.add(hparcel)
+                if tri.index not in total_triangles_seen:
+                    total_triangles_seen.add(tri.index)
+                    prob_map = tri.prob_map
+                    added_to_hparcel = False
+                    for selected_parcel_index in prob_map:
+                        if trac == "y":
+                            probmap_file.write(str(tri.index) + " " + str(selected_parcel_index) + "\n")
+                        if selected_parcel_index != -1:
+                            for ap_inner in aparcels:
+                                selected_parcel = ap_inner.find_subparcel(selected_parcel_index)
+                                if selected_parcel is not None:
+                                    if ap_inner.label not in hparcels_map:
+                                        hparcels_map[ap_inner.label] = {}
+                                    if selected_parcel.label not in hparcels_map[ap_inner.label]:
+                                        hparcels_map[ap_inner.label][selected_parcel.label] = set()
+                                    hparcels_map[ap_inner.label][selected_parcel.label].add(tri)
+                                    added_to_hparcel = True
+                                    break
+                            if added_to_hparcel:
+                                break
+    for ap in aparcels:
+        if ap.label in hparcels_map:
+            for label, triangles in hparcels_map[ap.label].items():
+                sp = ap.find_subparcel(label)
+                hparcel = SubParcel(label, ap.label, triangles, [])
+                ap.add_hparcel_triangles(parcel_names[int(label)], triangles)
+                ap.hard_parcels.add(hparcel)
+                total_hard_parcels += 1
+                total_triangles_in_hard_parcels.update(triangles)   
+    if trac == "y":
+        probmap_file.close()
     return aparcels
 
 def get_PCC(aparcels,triangles):
@@ -382,8 +405,8 @@ def main():
     parser.add_argument('--output-dir', type=str, help='Output directory')
     parser.add_argument('--traceability',type= str, default='y', help='Write y, to obtain the traceability of the parcels')
     parser.add_argument('--size-thr', type=float, default='0.1',help='Size to delete small parcels')
-    parser.add_argument('--dc-thr', type=float, default='0.15',help='Less probable triangles in a parcel (probability)')
-    parser.add_argument('--idc', type=float, default='0.1',help='Percent of common triangles in the intersection of two density centers')
+    parser.add_argument('--dc-thr', type=float, default='0.1',help='Less probable triangles in a parcel (probability)')
+    parser.add_argument('--idc', type=float, default='0.4',help='Percent of common triangles in the intersection of two density centers')
     parser.add_argument('--ero', type=int, default='0',help='Erosion threshold')
     parser.add_argument('--dil', type=int, default='1',help='Dilation threshold')
     parser.add_argument('--Lremove-list-path', type=str, help='Path to the Left ventricle list of subparcels to remove file')

@@ -190,7 +190,8 @@ def create_fusion_list(anatomic_parcel,dc_thr,thr_idc,names,hemi):
     visited = np.zeros(len(names), bool)
     for clique in cliques:
         parcel_list = joinable_sparcels(clique,visited)
-        fusion_list.append(parcel_list)
+        if len(parcel_list) > 1:
+            fusion_list.append(parcel_list)
     return fusion_list
 
 
@@ -276,7 +277,7 @@ def processing_parcels(aparcels,idc,dc_thr,size_thr,parcel_names,trac,trac_path,
             if trac == "y":
                 fusion_file = open(trac_path+"/"+hemi+"fusion.txt","a+")
             """Remove less representative triangle from subparcels"""
-            for i, subparcel in anatomic_parcel.sub_parcels.items():
+            for j, subparcel in anatomic_parcel.sub_parcels.items():
                 remove_less_representative_triangles(subparcel)
                 if len(subparcel.triangles) == 0:
                     anatomic_parcel.remove_subparcel(subparcel) #debo eliminarlas después
@@ -285,11 +286,10 @@ def processing_parcels(aparcels,idc,dc_thr,size_thr,parcel_names,trac,trac_path,
             n_remove += remove_small_parcels(aparcels,anatomic_parcel,parcel_names,size_thr,trac,trac_path,hemi)
             """Parcel overlapping"""
             fusion_list = create_fusion_list(anatomic_parcel,dc_thr,idc,parcel_names,hemi)
-            if trac == "y":
-                fusion_file.write("ap "+str(anatomic_parcel.label)+"\n")
             for list in fusion_list:
                 if len(list)>0:
                     if trac == "y":
+                        fusion_file.write("ap "+str(anatomic_parcel.label)+"\n")
                         fusion_file.write(" ".join([str(parcel.label) for parcel in list])+"\n")
                 if (len(list)>1):
                     parcel_names = fusion(aparcels,anatomic_parcel,list,parcel_names)

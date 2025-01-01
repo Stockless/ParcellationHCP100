@@ -324,7 +324,7 @@ def multiple_DSC_comp():
 #Sujeto base. Puede ser cualquiera, ya que todos los mallados tienen triángulos correspondientes.
 sub = '101410'
 meshes_path= 'D:/documentos/universidad/TESIS/HCP100/Mallados/'
-dice_thr=0.6
+dice_thr=0.4
 
 # Selección de atlas a comparar.
 atlases = ['atlas/Lefranc','atlas/Brainnetome','atlas/Narciso','atlas/Richards']
@@ -347,84 +347,65 @@ with open('atlas/Richards_Rparcels.pkl','wb') as handle:
 #visualize_parcellation(meshes_path, lh_atlas_common, rh_atlas_common, sub, seed = 47)
 #visualize_parcellation(meshes_path, lh_mine_common, rh_mine_common, sub, seed = 47)
 
-Lparcels_final, Rparcels_final= load_parcels('final', '../8-parcellation/output/')
-Lparcels_ps, Rparcels_ps= load_parcels('ps', '../8-parcellation/output/')
-Lparcels_fp, Rparcels_fp= load_parcels('fp', '../8-parcellation/output/')
-Lparcels_hard, Rparcels_hard= load_parcels('hard', '../8-parcellation/output/')
-Lparcels_cc, Rparcels_cc= load_parcels('cc', '../8-parcellation/output/')
-#Lparcels_ps, Rparcels_ps= load_parcels('ps', final_parcels)
-#Lparcels_fp, Rparcels_fp= load_parcels('fp', final_parcels)
-#Lparcels_hard, Rparcels_hard= load_parcels('hard', final_parcels)
-#Lparcels_cc, Rparcels_cc= load_parcels('cc', final_parcels)
-#Lparcels_final, Rparcels_final= load_parcels('final', final_parcels)
+#Lparcels_final, Rparcels_final= load_parcels('final', '../8-parcellation/output/')
+#Lparcels_ps, Rparcels_ps= load_parcels('ps', '../8-parcellation/output/')
+#Lparcels_fp, Rparcels_fp= load_parcels('fp', '../8-parcellation/output/')
+#Lparcels_hard, Rparcels_hard= load_parcels('hard', '../8-parcellation/output/')
+#Lparcels_cc, Rparcels_cc= load_parcels('cc', '../8-parcellation/output/')
+Lparcels_ps, Rparcels_ps= load_parcels('ps', final_parcels)
+Lparcels_fp, Rparcels_fp= load_parcels('fp', final_parcels)
+Lparcels_hard, Rparcels_hard= load_parcels('hard', final_parcels)
+Lparcels_cc, Rparcels_cc= load_parcels('cc', final_parcels)
+Lparcels_final, Rparcels_final= load_parcels('final', final_parcels)
 print(len(Lparcels_final),len(Rparcels_final))
-Lbig, Rbig = 0,0
-Lsmall, Rsmall = 9999999,999999
-suma_parcelas = 0 
-numero_parcelas = 0
-sizes = []
-for v in Lparcels_final:
-    if 0 < len(Lparcels_final[v]) < 5000:
-        if Lbig < len(Lparcels_final[v]):
-            Lbig = len(Lparcels_final[v])
-        if Lsmall > len(Lparcels_final[v]):
-            Lsmall = len(Lparcels_final[v])
-        suma_parcelas += len(Lparcels_final[v])
-        numero_parcelas += 1
-        sizes.append(len(Lparcels_final[v]))
-print(Lbig,Lsmall,suma_parcelas/numero_parcelas)
+def calculate_parcel_stats(parcels):
+    big, small = 0, float('inf')
+    suma_parcelas = 0 
+    numero_parcelas = 0
+    sizes = []
+    for v in parcels:
+        if 0 < len(parcels[v]) < 5000:
+            if big < len(parcels[v]):
+                big = len(parcels[v])
+            if small > len(parcels[v]):
+                small = len(parcels[v])
+            suma_parcelas += len(parcels[v])
+            numero_parcelas += 1
+            sizes.append(len(parcels[v]))
+    avg = suma_parcelas / numero_parcelas if numero_parcelas > 0 else 0
+    std = np.std(sizes) if sizes else 0
+    return numero_parcelas, big, small, avg, std, sizes
+
+Lstats = calculate_parcel_stats(Lparcels_final)
+Rstats = calculate_parcel_stats(Rparcels_final)
+
+print("Lparcels_final - Number of parcels: {}, Largest parcel: {}, Smallest parcel: {}, Average size: {}, Std dev: {}".format(*Lstats[:5]))
+print("Rparcels_final - Number of parcels: {}, Largest parcel: {}, Smallest parcel: {}, Average size: {}, Std dev: {}".format(*Rstats[:5]))
+
 # Plot histogram of the vector to show the distribution
-plt.hist(sizes, bins=30, density=True, alpha=0.6, color='b')
+plt.hist(Lstats[5], bins=30, density=False, alpha=0.6, color='b', label='Left hemisphere parcels')
+plt.hist(Rstats[5], bins=30, density=False, alpha=0.6, color='r', label='Right hemisphere parcels')
 
-# Fit a normal distribution to the data
-mu, std = norm.fit(sizes)
+# Add legend
+plt.legend(loc='upper right')
 
-# Plot the normal distribution (bell curve)
-xmin, xmax = plt.xlim()
-x = np.linspace(xmin, xmax, 100)
-p = norm.pdf(x, mu, std)
-plt.plot(x, p, 'k', linewidth=2)
-
-# Add labels and title
+# Add axis labels and title
+plt.xlabel('Número de triángulos')
+plt.ylabel('Número de parcelas')
 plt.title('Distribución de tamaños de parcelas')
-plt.xlabel('Numero de parcelas')
-plt.ylabel('Densidad de parcelas de cada tamaño')
+
+# Set x-axis ticks
+max_size = max(max(Lstats[5]), max(Rstats[5]))
+plt.xticks(range(0, max_size + 1, max_size // 10))
 
 plt.show()
-suma_parcelas = 0 
-numero_parcelas = 0
-sizes = []
-for v in Rparcels_final:
-    if 0 < len(Rparcels_final[v]) < 5000:
-        if Rbig < len(Rparcels_final[v]):
-            Rbig = len(Rparcels_final[v])
-        if Rsmall > len(Rparcels_final[v]):
-            Rsmall = len(Rparcels_final[v])
-        suma_parcelas += len(Rparcels_final[v])
-        numero_parcelas += 1
-        sizes.append(len(Rparcels_final[v]))
-#print(Rbig,Rsmall,suma_parcelas/numero_parcelas)
-# Plot histogram of the vector to show the distribution
-plt.hist(sizes, bins=30, density=True, alpha=0.6, color='b')
 
 # Fit a normal distribution to the data
-mu, std = norm.fit(sizes)
+mu_L, std_L = norm.fit(Lstats[5])
+mu_R, std_R = norm.fit(Rstats[5])
 
-# Plot the normal distribution (bell curve)
-xmin, xmax = plt.xlim()
-x = np.linspace(xmin, xmax, 100)
-p = norm.pdf(x, mu, std)
-plt.plot(x, p, 'k', linewidth=2)
-
-# Add labels and title
-plt.title('Distribución de tamaños de parcelas')
-plt.xlabel('Numero de parcelas')
-plt.ylabel('Densidad de parcelas de cada tamaño')
-
-plt.show()
-#
-#visualize_parcellation(meshes_path, Lparcels_ps, Rparcels_ps, sub, seed = semilla_visualizacion)
-#visualize_parcellation(meshes_path, Lparcels_fp, Rparcels_fp, sub, seed = semilla_visualizacion)
-#visualize_parcellation(meshes_path, Lparcels_hard, Rparcels_hard, sub, seed = semilla_visualizacion)
-#visualize_parcellation(meshes_path, Lparcels_cc, Rparcels_cc, sub, seed = semilla_visualizacion)
+visualize_parcellation(meshes_path, Lparcels_ps, Rparcels_ps, sub, seed = semilla_visualizacion)
+visualize_parcellation(meshes_path, Lparcels_fp, Rparcels_fp, sub, seed = semilla_visualizacion)
+visualize_parcellation(meshes_path, Lparcels_hard, Rparcels_hard, sub, seed = semilla_visualizacion)
+visualize_parcellation(meshes_path, Lparcels_cc, Rparcels_cc, sub, seed = semilla_visualizacion)
 visualize_parcellation(meshes_path, Lparcels_final, Rparcels_final, sub, seed = semilla_visualizacion)

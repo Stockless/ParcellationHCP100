@@ -122,7 +122,7 @@ def assign_preliminary_subparcels(infile,subject_name,name,parcel_names,triangle
     with open(infile) as f:
         content = f.readlines()
         if (content[0] != '0\n'):
-            bundle_name = utils.get_bundle_names(name)
+            bundle_name, bundle_dk_name = utils.get_bundle_names(name)
             if len(bundle_name) == 1:
                 print("There are large fascicles. Segment them with the filtering tools and try again.")
                 sys.exit()
@@ -131,8 +131,8 @@ def assign_preliminary_subparcels(infile,subject_name,name,parcel_names,triangle
                 bundle_index = "_"+str(bundle_name[2])
 
             """Gets the anatomic parcels based on bundle names"""
-            anatomic_label1 = utils.find_label(bundle_name[0],parcel_names)
-            anatomic_label2 = utils.find_label(bundle_name[1],parcel_names)
+            anatomic_label1 = utils.find_label(bundle_dk_name[0],parcel_names)
+            anatomic_label2 = utils.find_label(bundle_dk_name[1],parcel_names)
             anatomic_parcel1 = anatomic_parcels[anatomic_label1]
             anatomic_parcel2 = anatomic_parcels[anatomic_label2]
 
